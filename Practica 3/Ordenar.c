@@ -12,8 +12,9 @@ int partition(int arr[], int low, int high)
 {
     int pivot = arr[high];
     int i = low - 1;
+    int j; 
 
-    for (int j = low; j <= high - 1; j++)
+    for ( j = low; j <= high - 1; j++)
     {
         if (arr[j] < pivot)
         {
@@ -39,6 +40,7 @@ void quick_sort(int arr[], int low, int high)
 
 int main()
 {
+	int j; 
     FILE *input_file = NULL, *output_file = NULL;
     int i = 0, capacity = 1000000;
     int *arr = NULL;
@@ -90,7 +92,7 @@ int main()
         return 1;
     }
 
-    for (int j = 0; j < i - 1; j++) {
+    for ( j = 0; j < i - 1; j++) {
         fprintf(output_file, "%d\n", arr[j]);
     }
 
