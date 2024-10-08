@@ -19,6 +19,7 @@ int es_numero_entero(const char *cadena)
 
 int busqueda_lineal(int arr[], int N, int x)
 {
+
     for (int i = 0; i < N; i++) {
         comparaciones++;
         if (arr[i] == x)
@@ -74,8 +75,6 @@ int leer_archivo(int numero_elementos, int *arr)
         return 0;
     }
 
-    int indice_aleatorio = rand() % (file_size - numero_elementos);
-    fseek(file, indice_aleatorio * sizeof(int), SEEK_SET);
 
     while (i < numero_elementos && fscanf(file, "%d", &arr[i]) != EOF)
     {
@@ -106,6 +105,7 @@ int main(int argc, char *argv[])
         }
 
         arr = (int *)malloc(numero_elementos * sizeof(int));
+        leer_archivo(numero_elementos, arr);
 
         switch (opcion)
         {
@@ -143,6 +143,7 @@ int main(int argc, char *argv[])
         }
 
         arr = (int *)malloc(numero_elementos * sizeof(int));
+        leer_archivo(numero_elementos, arr);
 
         printf("Introduce el numero que quiere buscar: ");
         scanf("%d", &x);
