@@ -45,11 +45,11 @@ int desapilar(struct Pila* pila) {
 
 // Función para mostrar el movimiento de discos
 void moverDisco(char desdePoste, char hastaPoste, int disco) {
-    printf("Mueve el disco %d de \'%c\' a \'%c\'\n", disco, desdePoste, hastaPoste);
+    printf("Mover el disco %d de '%c' a '%c'\n", disco, desdePoste, hastaPoste);
 }
 
 // Función para implementar el movimiento legal entre dos postes
-void moverDiscosEntreDosPostes(struct Pila *origen, struct Pila *destino, char o, char d) {
+void moverDiscosEntreDosPostes(struct Pila *origen, struct Pila *destino, char o, char d, int *movimientos) {
     int cimaDiscoOrigen = desapilar(origen);
     int cimaDiscoDestino = desapilar(destino);
 
@@ -68,64 +68,65 @@ void moverDiscosEntreDosPostes(struct Pila *origen, struct Pila *destino, char o
         apilar(destino, cimaDiscoOrigen);
         moverDisco(o, d, cimaDiscoOrigen);
     }
+    (*movimientos)++; // Incrementar el contador de movimientos
 }
 
 // Función para implementar el problema iterativo de la Torre de Hanói
-void torrehanoiIterativo(int num_de_discos, struct Pila *origen, struct Pila *auxiliar, struct Pila *destino) {
-    int i, total_movimientos;
-    char o = 'O', d = 'D', a = 'A';
+void torrehanoiIterativo(int num_de_discos, struct Pila *origen, struct Pila *auxiliar, struct Pila *destino, int *movimientos) {
+    char o = 'A', d = 'C', a = 'B';
 
     if (num_de_discos % 2 == 0) {
         char temp = d;
         d = a;
         a = temp;
     }
-    total_movimientos = pow(2, num_de_discos) - 1;
 
-    for (i = num_de_discos; i >= 1; i--)
+    for (int i = num_de_discos; i >= 1; i--)
         apilar(origen, i);
 
-    for (i = 1; i <= total_movimientos; i++) {
+    int total_movimientos = pow(2, num_de_discos) - 1;
+
+    for (int i = 1; i <= total_movimientos; i++) {
         if (i % 3 == 1)
-            moverDiscosEntreDosPostes(origen, destino, o, d);
+            moverDiscosEntreDosPostes(origen, destino, o, d, movimientos);
         else if (i % 3 == 2)
-            moverDiscosEntreDosPostes(origen, auxiliar, o, a);
+            moverDiscosEntreDosPostes(origen, auxiliar, o, a, movimientos);
         else if (i % 3 == 0)
-            moverDiscosEntreDosPostes(auxiliar, destino, a, d);
+            moverDiscosEntreDosPostes(auxiliar, destino, a, d, movimientos);
     }
 }
 
 // Torres de hanoi recursiva
-int num;
-void hanoiRecursivo(int disco, char iniciar, char temp, char final) {
+void hanoiRecursivo(int disco, char iniciar, char temp, char final, int *movimientos) {
     if (disco == 1) {
-        printf("\nMueva el disco 1 de la base %c a la base %c", iniciar, final);
-        num++;
+        printf("Mover el disco 1 de '%c' a '%c'\n", iniciar, final);
+        (*movimientos)++; // Incrementar el contador de movimientos
         return;
     }
-    hanoiRecursivo(disco - 1, iniciar, final, temp);
-    printf("\nMover el disco %d de la base %c a la base %c", disco, iniciar, final);
-    num++;
-    hanoiRecursivo(disco - 1, temp, iniciar, final);
+    hanoiRecursivo(disco - 1, iniciar, final, temp, movimientos);
+    printf("Mover el disco %d de '%c' a '%c'\n", disco, iniciar, final);
+    (*movimientos)++; // Incrementar el contador de movimientos
+    hanoiRecursivo(disco - 1, temp, iniciar, final, movimientos);
 }
 
 int main() {
-    // para hanoi iterativo
-    unsigned num_de_discos = 3;
-    struct Pila *origen, *destino, *auxiliar;
-    origen = crearPila(num_de_discos);
-    auxiliar = crearPila(num_de_discos);
-    destino = crearPila(num_de_discos);
+    int disco, movimientos_iterativo = 0, movimientos_recursivo = 0;
 
-    torrehanoiIterativo(num_de_discos, origen, auxiliar, destino);
-
-    // para hanoi recursivo
-    int disco;
-    printf("Digite el numero de discos: ");
+    printf("Ingrese el número de discos: ");
     scanf("%d", &disco);
-    printf("Los movimientos para resolver la torre de Hanoi son : ");
-    hanoiRecursivo(disco, 'A', 'B', 'C');
-    printf("\nTotal de movimientos: %d\n", num);
+
+    // Para hanoi iterativo
+    struct Pila *origen = crearPila(disco);
+    struct Pila *destino = crearPila(disco);
+    struct Pila *auxiliar = crearPila(disco);
+
+    printf("Movimientos (iterativo):\n");
+    torrehanoiIterativo(disco, origen, auxiliar, destino, &movimientos_iterativo);
+    printf("Total de movimientos (iterativo): %d\n", movimientos_iterativo);
+
+    printf("\nMovimientos (recursivo):\n");
+    hanoiRecursivo(disco, 'A', 'B', 'C', &movimientos_recursivo);
+    printf("Total de movimientos (recursivo): %d\n", movimientos_recursivo);
 
     // Liberar memoria
     free(origen->arreglo);
