@@ -1,147 +1,137 @@
-struct Stack 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <math.h>
+
+// Estructura de la Pila
+struct Pila 
 { 
-unsigned capacity; 
-int top; 
-int *array; 
+    unsigned capacidad; 
+    int cima; 
+    int *arreglo; 
 }; 
  
-// function to create a stack of given capacity. 
-struct Stack* createStack(unsigned capacity) 
+// Función para crear una pila con la capacidad dada
+struct Pila* crearPila(unsigned capacidad) 
 { 
-    struct Stack* stack = 
-        (struct Stack*) malloc(sizeof(struct Stack)); 
-    stack -> capacity = capacity; 
-    stack -> top = -1; 
-    stack -> array = 
-        (int*) malloc(stack -> capacity * sizeof(int)); 
-    return stack; 
+    struct Pila* pila = (struct Pila*) malloc(sizeof(struct Pila)); 
+    pila->capacidad = capacidad; 
+    pila->cima = -1; 
+    pila->arreglo = (int*) malloc(pila->capacidad * sizeof(int)); 
+    return pila; 
 } 
  
-// Stack is full when top is equal to the last index 
-int isFull(struct Stack* stack) 
+// La pila está llena cuando cima es igual al último índice
+int estaLlena(struct Pila* pila) 
 { 
-return (stack->top == stack->capacity - 1); 
+    return (pila->cima == pila->capacidad - 1); 
 } 
  
-// Stack is empty when top is equal to -1 
-int isEmpty(struct Stack* stack) 
+// La pila está vacía cuando cima es igual a -1
+int estaVacia(struct Pila* pila) 
 { 
-return (stack->top == -1); 
+    return (pila->cima == -1); 
 } 
  
-// Function to add an item to stack. It increases 
-// top by 1 
-void push(struct Stack *stack, int item) 
+// Función para añadir un elemento a la pila. Aumenta la cima en 1
+void apilar(struct Pila *pila, int elemento) 
 { 
-    if (isFull(stack)) 
+    if (estaLlena(pila)) 
         return; 
-    stack -> array[++stack -> top] = item; 
+    pila->arreglo[++pila->cima] = elemento; 
 } 
  
-// Function to remove an item from stack. It 
-// decreases top by 1 
-int pop(struct Stack* stack) 
+// Función para eliminar un elemento de la pila. Disminuye la cima en 1
+int desapilar(struct Pila* pila) 
 { 
-    if (isEmpty(stack)) 
+    if (estaVacia(pila)) 
         return INT_MIN; 
-    return stack -> array[stack -> top--]; 
+    return pila->arreglo[pila->cima--]; 
 } 
  
-//Function to show the movement of disks 
-void moveDisk(char fromPeg, char toPeg, int disk) 
+// Función para mostrar el movimiento de discos
+void moverDisco(char desdePoste, char hastaPoste, int disco) 
 { 
-    printf("Move the disk %d from \'%c\' to \'%c\'\n", 
-        disk, fromPeg, toPeg); 
+    printf("Mueve el disco %d de \'%c\' a \'%c\'\n", disco, desdePoste, hastaPoste); 
 }
  
-// Function to implement legal movement between 
-// two poles 
-void moveDisksBetweenTwoPoles(struct Stack *src, 
-            struct Stack *dest, char s, char d) 
+// Función para implementar el movimiento legal entre dos postes
+void moverDiscosEntreDosPostes(struct Pila *origen, struct Pila *destino, char o, char d) 
 { 
-    int pole1TopDisk = pop(src); 
-    int pole2TopDisk = pop(dest); 
+    int cimaDiscoOrigen = desapilar(origen); 
+    int cimaDiscoDestino = desapilar(destino); 
  
-    // When pole 1 is empty 
-    if (pole1TopDisk == INT_MIN) 
+    // Cuando el poste de origen está vacío
+    if (cimaDiscoOrigen == INT_MIN) 
     { 
-        push(src, pole2TopDisk); 
-        moveDisk(d, s, pole2TopDisk); 
+        apilar(origen, cimaDiscoDestino); 
+        moverDisco(d, o, cimaDiscoDestino); 
     } 
- 
-    // When pole2 pole is empty 
-    else if (pole2TopDisk == INT_MIN) 
+    // Cuando el poste de destino está vacío
+    else if (cimaDiscoDestino == INT_MIN) 
     { 
-        push(dest, pole1TopDisk); 
-        moveDisk(s, d, pole1TopDisk); 
+        apilar(destino, cimaDiscoOrigen); 
+        moverDisco(o, d, cimaDiscoOrigen); 
     } 
- 
-    // When top disk of pole1 > top disk of pole2 
-    else if (pole1TopDisk > pole2TopDisk) 
+    // Cuando el disco en la cima del origen > disco en la cima del destino
+    else if (cimaDiscoOrigen > cimaDiscoDestino) 
     { 
-        push(src, pole1TopDisk); 
-        push(src, pole2TopDisk); 
-        moveDisk(d, s, pole2TopDisk); 
+        apilar(origen, cimaDiscoOrigen); 
+        apilar(origen, cimaDiscoDestino); 
+        moverDisco(d, o, cimaDiscoDestino); 
     } 
- 
-    // When top disk of pole1 < top disk of pole2 
+    // Cuando el disco en la cima del origen < disco en la cima del destino
     else
     { 
-        push(dest, pole2TopDisk); 
-        push(dest, pole1TopDisk); 
-        moveDisk(s, d, pole1TopDisk); 
+        apilar(destino, cimaDiscoDestino); 
+        apilar(destino, cimaDiscoOrigen); 
+        moverDisco(o, d, cimaDiscoOrigen); 
     } 
 } 
  
-//Function to implement TOH puzzle 
-void tohIterative(int num_of_disks, struct Stack 
-            *src, struct Stack *aux, 
-            struct Stack *dest) 
+// Función para implementar el problema iterativo de la Torre de Hanói
+void torrehanoiIterativo(int num_de_discos, struct Pila *origen, struct Pila *auxiliar, struct Pila *destino) 
 { 
-    int i, total_num_of_moves; 
-    char s = 'S', d = 'D', a = 'A'; 
+    int i, total_movimientos; 
+    char o = 'O', d = 'D', a = 'A'; 
  
-    //If number of disks is even, then interchange 
-    //destination pole and auxiliary pole 
-    if (num_of_disks % 2 == 0) 
+    // Si el número de discos es par, intercambiar destino y auxiliar
+    if (num_de_discos % 2 == 0) 
     { 
         char temp = d; 
         d = a; 
         a = temp; 
     } 
-    total_num_of_moves = pow(2, num_of_disks) - 1; 
+    total_movimientos = pow(2, num_de_discos) - 1; 
  
-    //Larger disks will be pushed first 
-    for (i = num_of_disks; i >= 1; i--) 
-        push(src, i); 
+    // Los discos más grandes se apilan primero
+    for (i = num_de_discos; i >= 1; i--) 
+        apilar(origen, i); 
  
-    for (i = 1; i <= total_num_of_moves; i++) 
+    for (i = 1; i <= total_movimientos; i++) 
     { 
         if (i % 3 == 1) 
-        moveDisksBetweenTwoPoles(src, dest, s, d); 
- 
+            moverDiscosEntreDosPostes(origen, destino, o, d); 
         else if (i % 3 == 2) 
-        moveDisksBetweenTwoPoles(src, aux, s, a); 
- 
+            moverDiscosEntreDosPostes(origen, auxiliar, o, a); 
         else if (i % 3 == 0) 
-        moveDisksBetweenTwoPoles(aux, dest, a, d); 
+            moverDiscosEntreDosPostes(auxiliar, destino, a, d); 
     } 
 } 
  
-// Driver Program 
+// Función principal
 int main() 
 { 
-    // Input: number of disks 
-    unsigned num_of_disks = 3; 
+    // Entrada: número de discos
+    unsigned num_de_discos = 3; 
  
-    struct Stack *src, *dest, *aux; 
+    struct Pila *origen, *destino, *auxiliar; 
  
-    // Create three stacks of size 'num_of_disks' 
-    // to hold the disks 
-    src = createStack(num_of_disks); 
-    aux = createStack(num_of_disks); 
-    dest = createStack(num_of_disks); 
+    // Crear tres pilas de tamaño 'num_de_discos' para almacenar los discos
+    origen = crearPila(num_de_discos); 
+    auxiliar = crearPila(num_de_discos); 
+    destino = crearPila(num_de_discos); 
  
-    tohIterative(num_of_disks, src, aux, dest); 
+    torrehanoiIterativo(num_de_discos, origen, auxiliar, destino); 
     return 0; 
-} 
+}
