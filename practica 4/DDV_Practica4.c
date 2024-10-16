@@ -34,11 +34,11 @@ void fibonacci_iterativo(int n) {
     }
 }
 
-void fibonacci_recursivo(int n) {
+int fibonacci_recursivo(int n) {
     if (n <= 1) {
         return n;
     }
-    return fibonacci(n - 1) + fibonacci(n - 2);
+    return fibonacci_recursivo(n - 1) + fibonacci_recursivo(n - 2);
 }
 
 // Función para crear una pila con la capacidad dada
@@ -139,33 +139,104 @@ void hanoiRecursivo(int disco, char iniciar, char temp, char final, int *movimie
     (*movimientos)++; // Incrementar el contador de movimientos
     hanoiRecursivo(disco - 1, temp, iniciar, final, movimientos);
 }
+int factorialIterativo(int n) {
+    int factorial_result = 1;
+    int i;
+
+    // Bucle desde 1 hasta N para calcular el factorial
+    for (i = 1; i <= n; i++) {
+        factorial_result *= i; // Multiplica cada número
+    }
+
+    return factorial_result; // Retorna el resultado
+}
+
+int factorialRecursivo(int numero) {
+    // Si hemos llegado a 1, detenemos la recursión
+    if (numero <= 1)
+        return 1;
+    return numero * factorialRecursivo(numero - 1); // Llamada recursiva
+}
 
 int main() {
-    int disco, movimientos_iterativo = 0, movimientos_recursivo = 0;
+    int opcion, n, disco, movimientos_iterativo = 0, movimientos_recursivo = 0;
 
-    printf("Ingrese el número de discos: ");
-    scanf("%d", &disco);
+    do {
+        printf("\nMenu de Algoritmos\n");
+        printf("1. Fibonacci Iterativo\n");
+        printf("2. Fibonacci Recursivo\n");
+        printf("3. Factorial Iterativo\n");
+        printf("4. Factorial Recursivo\n");
+        printf("5. Torres de Hanoi Iterativo\n");
+        printf("6. Torres de Hanoi Recursivo\n");
+        printf("0. Salir\n");
+        printf("Seleccione una opcion: ");
+        scanf("%d", &opcion);
 
-    // Para hanoi iterativo
-    struct Pila *origen = crearPila(disco);
-    struct Pila *destino = crearPila(disco);
-    struct Pila *auxiliar = crearPila(disco);
+        switch (opcion) {
+            case 1:
+                printf("Ingrese el numero de terminos para Fibonacci iterativo: ");
+                scanf("%d", &n);
+                printf("Fibonacci iterativo: ");
+                fibonacci_iterativo(n);
+                break;
 
-    printf("Movimientos (iterativo):\n");
-    torrehanoiIterativo(disco, origen, auxiliar, destino, &movimientos_iterativo);
-    printf("Total de movimientos (iterativo): %d\n", movimientos_iterativo);
+            case 2:
+                printf("Ingrese el numero de terminos para Fibonacci recursivo: ");
+                scanf("%d", &n);
+                printf("Fibonacci recursivo: ");
+                for (int i = 0; i < n; i++) {
+                    printf("%d ", fibonacci_recursivo(i));
+                }
+                printf("\n");
+                break;
 
-    printf("\nMovimientos (recursivo):\n");
-    hanoiRecursivo(disco, 'A', 'B', 'C', &movimientos_recursivo);
-    printf("Total de movimientos (recursivo): %d\n", movimientos_recursivo);
+            case 3:
+                printf("Ingrese un numero para calcular el factorial iterativo: ");
+                scanf("%d", &n);
+                printf("Factorial iterativo de %d es %d\n", n, factorialIterativo(n));
+                break;
 
-    // Liberar memoria
-    free(origen->arreglo);
-    free(origen);
-    free(auxiliar->arreglo);
-    free(auxiliar);
-    free(destino->arreglo);
-    free(destino);
+            case 4:
+                printf("Ingrese un numero para calcular el factorial recursivo: ");
+                scanf("%d", &n);
+                printf("Factorial recursivo de %d es %d\n", n, factorialRecursivo(n));
+                break;
+
+            case 5:
+                printf("Ingrese el número de discos para la Torre de Hanoi iterativa: ");
+                scanf("%d", &disco);
+                struct Pila *origen = crearPila(disco);
+                struct Pila *destino = crearPila(disco);
+                struct Pila *auxiliar = crearPila(disco);
+                printf("Movimientos (iterativo):\n");
+                torrehanoiIterativo(disco, origen, auxiliar, destino, &movimientos_iterativo);
+                printf("Total de movimientos (iterativo): %d\n", movimientos_iterativo);
+                free(origen->arreglo);
+                free(origen);
+                free(auxiliar->arreglo);
+                free(auxiliar);
+                free(destino->arreglo);
+                free(destino);
+                break;
+
+            case 6:
+                printf("Ingrese el nemero de discos para la Torre de Hanoi recursiva: ");
+                scanf("%d", &disco);
+                printf("Movimientos (recursivo):\n");
+                hanoiRecursivo(disco, 'A', 'B', 'C', &movimientos_recursivo);
+                printf("Total de movimientos (recursivo): %d\n", movimientos_recursivo);
+                break;
+
+            case 0:
+                printf("Saliendo\n");
+                break;
+
+            default:
+                printf("Opcion no válida. Intente de nuevo.\n");
+                break;
+        }
+    } while (opcion != 0);
 
     return 0;
 }
