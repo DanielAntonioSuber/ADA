@@ -2,28 +2,26 @@
 #include <stdlib.h>
 #include <time.h>
 
-int maximo_recursivo(int *arr, int n)
-{
-    if (n == 1)
-    {
+long long comparaciones = 0;  // Contador global de comparaciones
+
+int maximo_recursivo(int *arr, int n) {
+    if (n == 1) {
         return arr[0];
     }
-    if (arr[0] < arr[n - 1])
-    {
+    comparaciones++; // Incremento de comparaciones
+    if (arr[0] < arr[n - 1]) {
         arr[0] = arr[n - 1];
     }
     n--;
     return maximo_recursivo(arr, n);
 }
 
-int minimo_recursivo(int *arr, int n)
-{
-    if (n == 1)
-    {
+int minimo_recursivo(int *arr, int n) {
+    if (n == 1) {
         return arr[0];
     }
-    if (arr[0] > arr[n - 1])
-    {
+    comparaciones++; // Incremento de comparaciones
+    if (arr[0] > arr[n - 1]) {
         arr[0] = arr[n - 1];
     }
     n--;
@@ -31,30 +29,34 @@ int minimo_recursivo(int *arr, int n)
 }
 
 int maximo_iterativo(int *numeros, int tamano) {
-    int mayor = numeros[0];  
+    int mayor = numeros[0];
     for (int i = 1; i < tamano; ++i) {
-        if (numeros[i] > mayor) 
+        comparaciones++; // Incremento de comparaciones
+        if (numeros[i] > mayor)
             mayor = numeros[i];
     }
-    return mayor;  
+    return mayor;
 }
 
 int minimo_iterativo(int *numeros, int tamano) {
-    int menor = numeros[0];  
+    int menor = numeros[0];
     for (int i = 1; i < tamano; ++i) {
-        if (numeros[i] < menor) 
+        comparaciones++; // Incremento de comparaciones
+        if (numeros[i] < menor)
             menor = numeros[i];
     }
-    return menor;  
+    return menor;
 }
 
 void maximo_minimo_iterativo(int *arr, int n, int *max, int *min) {
     *max = arr[0];
     *min = arr[0];
     for (int i = 1; i < n; ++i) {
+        comparaciones++; // Incremento de comparaciones
         if (arr[i] > *max) {
             *max = arr[i];
         }
+        comparaciones++; // Incremento de comparaciones
         if (arr[i] < *min) {
             *min = arr[i];
         }
@@ -70,16 +72,17 @@ void maximo_minimo_recursivo(int *arr, int n, int *max, int *min) {
 
     maximo_minimo_recursivo(arr, n - 1, max, min);
 
+    comparaciones++; // Incremento de comparaciones
     if (arr[n - 1] > *max) {
         *max = arr[n - 1];
     }
+    comparaciones++; // Incremento de comparaciones
     if (arr[n - 1] < *min) {
         *min = arr[n - 1];
     }
 }
 
-int leer_archivo(int numero_elementos, int *arr)
-{
+int leer_archivo(int numero_elementos, int *arr) {
     int i = 0;
     long file_size;
     FILE *file = NULL;
@@ -88,8 +91,7 @@ int leer_archivo(int numero_elementos, int *arr)
 
     printf("\nLeyendo el archivo numeros10millones.txt\n");
     file = fopen("numeros10millones.txt", "r");
-    if (file == NULL)
-    {
+    if (file == NULL) {
         printf("\nNo se puede abrir el archivo.\n");
         return 0;
     }
@@ -107,8 +109,7 @@ int leer_archivo(int numero_elementos, int *arr)
     int indice_aleatorio = rand() % (file_size - numero_elementos);
     fseek(file, indice_aleatorio * sizeof(int), SEEK_SET);
 
-    while (i < numero_elementos && fscanf(file, "%d", &arr[i]) != EOF)
-    {
+    while (i < numero_elementos && fscanf(file, "%d", &arr[i]) != EOF) {
         i++;
     }
 
@@ -151,28 +152,35 @@ int main() {
     }
 
     while (opt != 7) {
+        comparaciones = 0; // Reiniciar el contador de comparaciones
         opt = menu();
 
         switch (opt) {
         case 1:
             printf("\nMaximo (iterativo): %d\n", maximo_iterativo(arr, elementos_leidos));
+            printf("Numero de comparaciones: %lld\n", comparaciones);
             break;
         case 2:
             printf("\nMaximo (recursivo): %d\n", maximo_recursivo(arr, elementos_leidos));
+            printf("Numero de comparaciones: %lld\n", comparaciones);
             break;
         case 3:
             printf("\nMinimo (iterativo): %d\n", minimo_iterativo(arr, elementos_leidos));
+            printf("Numero de comparaciones: %lld\n", comparaciones);
             break;
         case 4:
             printf("\nMinimo (recursivo): %d\n", minimo_recursivo(arr, elementos_leidos));
+            printf("Numero de comparaciones: %lld\n", comparaciones);
             break;
         case 5:
             maximo_minimo_iterativo(arr, elementos_leidos, &max, &min);
             printf("\nMaximo y Minimo (iterativo): Max = %d, Min = %d\n", max, min);
+            printf("Numero de comparaciones: %lld\n", comparaciones);
             break;
         case 6:
             maximo_minimo_recursivo(arr, elementos_leidos, &max, &min);
             printf("\nMaximo y Minimo (recursivo): Max = %d, Min = %d\n", max, min);
+            printf("Numero de comparaciones: %lld\n", comparaciones);
             break;
         case 7:
             printf("\nSaliendo del programa.\n");
